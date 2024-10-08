@@ -24,7 +24,12 @@ func parseFile(file *multipart.FileHeader) (interfaces.File, error) {
 	if err != nil {
 		return interfaces.File{}, fmt.Errorf("failed to open file: %w", err)
 	}
-	defer fileReader.Close()
+	defer func(fileReader multipart.File) {
+		err := fileReader.Close()
+		if err != nil {
+			fmt.Println("Failed to close file reader:", err)
+		}
+	}(fileReader)
 
 	return interfaces.File{
 		Name:        file.Filename,
@@ -50,7 +55,12 @@ func ReadFileContent(fileHeader *multipart.FileHeader) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer file.Close()
+	defer func(file multipart.File) {
+		err := file.Close()
+		if err != nil {
+			fmt.Println("Failed to close file reader:", err)
+		}
+	}(file)
 
 	fileContent, err := io.ReadAll(file)
 	if err != nil {

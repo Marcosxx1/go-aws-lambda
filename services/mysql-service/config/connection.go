@@ -10,20 +10,20 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-// mysqlDatabase represents a MySQL database connection.
-type mysqlDatabase struct {
+// MysqlDatabase represents a MySQL database connection.
+type MysqlDatabase struct {
 	Db *sql.DB
 }
 
 // GetConn returns the underlying SQL database connection.
-func (mysql *mysqlDatabase) GetConn() *sql.DB {
+func (mysql *MysqlDatabase) GetConn() *sql.DB {
 	return mysql.Db
 }
 
 // NewMysqlDatabase creates a new MySQL database instance.
 // It fetches database credentials from AWS Secrets Manager based on the provided secret ID.
 // It returns a pointer to the mysqlDatabase or panics if an error occurs during initialization.
-func NewMysqlDatabase() *mysqlDatabase {
+func NewMysqlDatabase() *MysqlDatabase {
 	env, err := awsconfig.GetSecret(os.Getenv("SECRET_ID_MYSQL"))
 	if err != nil {
 		fmt.Println("Error fetching secret", err)
@@ -43,5 +43,5 @@ func NewMysqlDatabase() *mysqlDatabase {
 		panic(err)
 	}
 
-	return &mysqlDatabase{Db: db}
+	return &MysqlDatabase{Db: db}
 }
