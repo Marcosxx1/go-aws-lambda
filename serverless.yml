@@ -1,0 +1,78 @@
+service: tabloid-go-poc
+frameworkVersion: ^3.31.0
+ 
+plugins:
+  - serverless-offline
+useDotenv: true
+
+custom:
+  params:
+    APP_NAME: ${param:appName, 'GO_LAMBDA'}
+    API_GTW_STACK_NAME: ${ssm:/${opt:stage}/${self:custom.params.APP_NAME}/API_GTW_STACK_NAME}
+    AUTHORIZER_STACK_NAME: your-authorizer-stack-name-${self:provider.stage} # CHANGE HERE
+  serverless-offiline:
+    noPrependStageInUrl: true
+    useDocker: true
+package:
+  excludeDevDependencies: true
+
+provider:
+  name: aws
+  runtime: provided.al2
+  stage: ${opt:stage, 'dev'}
+  region: ${opt:region, 'sa-east-1'} # CHANGE HERE TO YOUR REGION
+  versionFunctions: false
+  stackTags:
+      project: "YOUR PROJECT NAME" # CHANGE HERE
+  httpApi:
+      id: ${cf:${self:custom.params.API_GTW_STACK_NAME}.ApiGatewayId}
+  deploymentBucket:
+    # Name of an existing bucket to use (default: created by serverless)
+    name: ${ssm:/${opt:stage}/${self:custom.params.APP_NAME}/DEPLOYMENT_BUCKET_NAME}
+  environment:
+    REGION: ${self:provider.region}
+    AWS_S3_BUCKET_NAME_S3: ${ssm:/${opt:stage}/${self:custom.params.APP_NAME}/AWS_S3_BUCKET_NAME_S3}
+    SECRET_ID_MYSQL: ${ssm:/${opt:stage}/${self:custom.params.APP_NAME}/SECRET_ID_MYSQL}
+    CDN_URL: ${ssm:/${opt:stage}/${self:custom.params.APP_NAME}/CDN_URL}
+    DEBUG: ${ssm:/${opt:stage}/${self:custom.params.APP_NAME}/DEBUG}
+  iam:
+    role:
+      name: "define-here-the-name-${sls:stage}" # CHANGE HERE
+      statements:
+        - Effect: 'Allow'
+          Action:
+            - 'secretsmanager:GetSecretValue'
+          Resource:
+            - ${ssm:/${opt:stage}/${self:custom.params.APP_NAME}/DB_CREDENTIALS_SECRET_ARN}
+        - Effect: 'Allow'
+          Action:
+            - 's3:*'
+          Resource: 
+            - "arn:aws:s3:::${ssm:/${opt:stage}/${self:custom.params.APP_NAME}/AWS_S3_BUCKET_NAME_S3}/*"
+            - "arn:aws:s3:::${ssm:/${opt:stage}/${self:custom.params.APP_NAME}/AWS_S3_BUCKET_NAME_S3}"
+functions:
+  postTestCreateTabloid:
+    name: create-tabloid-golang-${sls:stage}
+    handler: main.go
+    # role: ${ssm:/${opt:stage}/${self:custom.params.APP_NAME}/ROLE_ARN}
+    timeout: 28
+    events:
+      - httpApi:
+          path: /test
+          method: POST
+          authorizer:
+            type: request
+            id: ${cf:${self:custom.params.AUTHORIZER_STACK_NAME}.AuthorizerId}
+    vpc:
+      securityGroupIds:
+        - ${ssm:/${opt:stage}/${self:custom.params.APP_NAME}/SECURITY_GROUP_1}
+      subnetIds:
+        - ${ssm:/${opt:stage}/${self:custom.params.APP_NAME}/SUBNET_ID_1}
+        - ${ssm:/${opt:stage}/${self:custom.params.APP_NAME}/SUBNET_ID_2}
+resources:
+  Resources:
+    HttpApiIntegrationPostTestCreateTabloid:
+      Type: AWS::ApiGatewayV2::Integration
+      Properties:
+        RequestParameters:
+          'overwrite:header.x-username': '$context.authorizer.username'
