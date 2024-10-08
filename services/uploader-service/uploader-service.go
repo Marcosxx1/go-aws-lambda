@@ -65,8 +65,8 @@ func (adapter *UploaderAdapter) UploadImage(image []byte, tabloidID int64, order
 func (adapter *UploaderAdapter) getImageKey(image []byte, tabloidID int64, order int) string {
 	extension := adapter.getImageExtension(image)
 	pagina := order + 1
-	uuid := uuid.New()
-	return fmt.Sprintf("RPA/v3/%d/campanha-%d-%s-pagina-%d%s", tabloidID, tabloidID, uuid, pagina, extension)
+	randomId := uuid.New()
+	return fmt.Sprintf("RPA/v3/%d/campanha-%d-%s-pagina-%d%s", tabloidID, tabloidID, randomId, pagina, extension)
 }
 
 // validateImage checks if the image has a valid content type.

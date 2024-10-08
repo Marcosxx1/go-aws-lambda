@@ -114,7 +114,10 @@ func HandlePostRequest(c *gin.Context) {
 	}
 
 	// Commit the transaction
-	transaction.Commit()
+	err = transaction.Commit()
+	if err != nil {
+		return
+	}
 
 	// Respond with success
 	c.JSON(http.StatusOK, formData)

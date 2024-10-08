@@ -37,7 +37,10 @@ func main() {
 			r := gin.Default()
 			r.POST("/test", usecase.HandlePostRequest)
 			address := fmt.Sprintf(":%s", os.Getenv("PORT"))
-			r.Run(address)
+			err := r.Run(address)
+			if err != nil {
+				return
+			}
 		}
 	}
 
