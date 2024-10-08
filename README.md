@@ -31,7 +31,7 @@ I created this Lambda five months ago (March 2024) before I began studying and w
 ### 2.1 Clone Repository
 
    ```bash
-   git clone <url_to_define>
+   git clone https://github.com/Marcosxx1/go-lambda.git
    ```
 
 ### 2.2 Install Go
