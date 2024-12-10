@@ -24,7 +24,18 @@ I created this Lambda five months ago (March 2024) before I began studying and w
 
 This comparison highlights the differences between Go and Node.js when deployed as AWS Lambda functions. The results show Go's efficiency in terms of execution time, memory usage, billed duration, and cold-start time compared to Node.js.
 
+#### Lambda Node:
+![lambda_node](https://github.com/user-attachments/assets/cf973538-9eb7-4126-81c0-d95b4c17c657)
+![result_node](https://github.com/user-attachments/assets/835de21f-ec06-44f6-890e-45b0e7a047a0)
+
+
+#### Lambda Go
+![lambda_go](https://github.com/user-attachments/assets/4283e683-f2bb-4b8f-8491-ee6629447c84)
+![result_go](https://github.com/user-attachments/assets/2eb92d91-067f-47b7-b426-aaec9a7e4ee1)
+
+
 #### Key Metrics:
+This test was executed with the same payload and criteria for each of the lambdas
 - **Execution Time:** Measures how long the function takes to run.
 - **Memory Usage:** Reflects the maximum memory consumed during the execution.
 - **Billed Duration:** The duration billed by AWS, rounded up to the nearest 100ms.
